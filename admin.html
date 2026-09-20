@@ -52,6 +52,11 @@
       margin-top: 0;
     }
 
+    h3 {
+      font-size: 25px;
+      color: #24477d;
+    }
+
     label {
       display: block;
       font-weight: bold;
@@ -60,13 +65,20 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
       width: 100%;
       padding: 17px;
       border: 2px solid #d6dce6;
       border-radius: 14px;
       font-size: 18px;
       background: white;
+      font-family: Arial, sans-serif;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
     }
 
     button {
@@ -138,6 +150,36 @@
       color: #24477d;
     }
 
+    .event {
+      background: #f5f7fa;
+      border-left: 5px solid #24477d;
+      padding: 18px;
+      margin: 15px 0;
+      border-radius: 12px;
+    }
+
+    .event-status {
+      font-size: 20px;
+      font-weight: bold;
+      color: #24477d;
+    }
+
+    .event-location {
+      margin-top: 7px;
+      font-weight: bold;
+    }
+
+    .event-description {
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .event-time {
+      margin-top: 10px;
+      color: #666;
+      font-size: 14px;
+    }
+
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -193,18 +235,24 @@
       placeholder="Enter password"
     >
 
-    <button id="loginButton" type="button">Login</button>
+    <button id="loginButton" type="button">
+      Login
+    </button>
 
     <div id="loginMessage" class="message"></div>
   </div>
 
+
   <!-- ADMIN DASHBOARD -->
   <div id="dashboard" class="hidden">
 
+    <!-- MANAGE SHIPMENT -->
     <div class="card">
+
       <h2>Manage Shipment</h2>
 
       <label for="trackingNumber">Tracking Number</label>
+
       <input
         id="trackingNumber"
         type="text"
@@ -218,11 +266,13 @@
 
       <div id="searchMessage" class="message"></div>
 
+
       <div id="shipmentSection" class="hidden">
 
         <div id="shipmentInfo" class="shipment-info"></div>
 
         <label for="status">Shipment Status</label>
+
         <select id="status">
           <option value="Shipment Created">Shipment Created</option>
           <option value="Picked Up">Picked Up</option>
@@ -234,14 +284,18 @@
           <option value="Delayed">Delayed</option>
         </select>
 
+
         <label for="currentLocation">Current Location</label>
+
         <input
           id="currentLocation"
           type="text"
           placeholder="Example: Lagos, Nigeria"
         >
 
+
         <label for="progress">Progress (%)</label>
+
         <input
           id="progress"
           type="number"
@@ -250,11 +304,14 @@
           placeholder="0 - 100"
         >
 
+
         <label for="estimatedDelivery">Estimated Delivery</label>
+
         <input
           id="estimatedDelivery"
           type="date"
         >
+
 
         <button id="saveButton" type="button">
           Save Shipment Update
@@ -265,36 +322,153 @@
       </div>
     </div>
 
+
+    <!-- ADD TRACKING EVENT -->
+    <div id="eventCard" class="card hidden">
+
+      <h2>Add Tracking Event</h2>
+
+      <p>
+        Add a new event whenever the shipment reaches a new stage or location.
+      </p>
+
+
+      <label for="eventStatus">Event Status</label>
+
+      <select id="eventStatus">
+        <option value="Shipment Created">Shipment Created</option>
+        <option value="Picked Up">Picked Up</option>
+        <option value="In Transit">In Transit</option>
+        <option value="Arrived at Facility">Arrived at Facility</option>
+        <option value="Out for Delivery">Out for Delivery</option>
+        <option value="Delivered">Delivered</option>
+        <option value="Delivery Attempted">Delivery Attempted</option>
+        <option value="Delayed">Delayed</option>
+      </select>
+
+
+      <label for="eventLocation">Event Location</label>
+
+      <input
+        id="eventLocation"
+        type="text"
+        placeholder="Example: Lagos, Nigeria"
+      >
+
+
+      <label for="eventDescription">Description</label>
+
+      <textarea
+        id="eventDescription"
+        placeholder="Example: Package arrived at Lagos sorting facility."
+      ></textarea>
+
+
+      <div class="row">
+
+        <div>
+          <label for="eventLatitude">Latitude (optional)</label>
+
+          <input
+            id="eventLatitude"
+            type="number"
+            step="any"
+            placeholder="Example: 6.5244"
+          >
+        </div>
+
+        <div>
+          <label for="eventLongitude">Longitude (optional)</label>
+
+          <input
+            id="eventLongitude"
+            type="number"
+            step="any"
+            placeholder="Example: 3.3792"
+          >
+        </div>
+
+      </div>
+
+
+      <button id="addEventButton" type="button">
+        Add Tracking Event
+      </button>
+
+      <div id="eventMessage" class="message"></div>
+
+    </div>
+
+
+    <!-- TRACKING HISTORY -->
+    <div id="historyCard" class="card hidden">
+
+      <h2>Tracking History</h2>
+
+      <div id="historyMessage" class="message"></div>
+
+      <div id="eventHistory"></div>
+
+    </div>
+
+
+    <!-- LOGOUT -->
     <div class="card">
-      <button id="logoutButton" class="logout" type="button">
+
+      <button
+        id="logoutButton"
+        class="logout"
+        type="button"
+      >
         Logout
       </button>
+
     </div>
 
   </div>
 
 </div>
 
-<!-- Supabase -->
+
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
   const SUPABASE_URL =
     "https://vhwubwndtprchiwyvaxr.supabase.co";
 
   const SUPABASE_KEY =
     "sb_publishable_ew7AMBuWsEnIN7DX-yDesQ_toD2QZ8V";
 
+
   let supabaseClient = null;
+
   let currentShipment = null;
 
-  const loginCard = document.getElementById("loginCard");
-  const dashboard = document.getElementById("dashboard");
 
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const loginButton = document.getElementById("loginButton");
-  const loginMessage = document.getElementById("loginMessage");
+  /* LOGIN ELEMENTS */
+
+  const loginCard =
+    document.getElementById("loginCard");
+
+  const dashboard =
+    document.getElementById("dashboard");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const passwordInput =
+    document.getElementById("password");
+
+  const loginButton =
+    document.getElementById("loginButton");
+
+  const loginMessage =
+    document.getElementById("loginMessage");
+
+
+  /* SHIPMENT ELEMENTS */
 
   const trackingNumberInput =
     document.getElementById("trackingNumber");
@@ -329,117 +503,205 @@
   const saveMessage =
     document.getElementById("saveMessage");
 
+
+  /* EVENT ELEMENTS */
+
+  const eventCard =
+    document.getElementById("eventCard");
+
+  const eventStatusInput =
+    document.getElementById("eventStatus");
+
+  const eventLocationInput =
+    document.getElementById("eventLocation");
+
+  const eventDescriptionInput =
+    document.getElementById("eventDescription");
+
+  const eventLatitudeInput =
+    document.getElementById("eventLatitude");
+
+  const eventLongitudeInput =
+    document.getElementById("eventLongitude");
+
+  const addEventButton =
+    document.getElementById("addEventButton");
+
+  const eventMessage =
+    document.getElementById("eventMessage");
+
+  const historyCard =
+    document.getElementById("historyCard");
+
+  const historyMessage =
+    document.getElementById("historyMessage");
+
+  const eventHistory =
+    document.getElementById("eventHistory");
+
+
   const logoutButton =
     document.getElementById("logoutButton");
 
 
+  /* MESSAGE HELPERS */
+
   function showMessage(element, message, type) {
+
     element.textContent = message;
-    element.className = "message " + type;
+
+    element.className =
+      "message " + type;
   }
 
 
   function clearMessage(element) {
+
     element.textContent = "";
+
     element.className = "message";
   }
 
 
+  /* START SUPABASE */
+
   function startSupabase() {
+
     if (!window.supabase) {
+
       showMessage(
         loginMessage,
         "Supabase could not load. Please refresh this page and try again.",
         "error"
       );
+
       return false;
     }
 
-    supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
 
     return true;
   }
 
 
+  /* SESSION */
+
   async function checkExistingSession() {
+
     if (!supabaseClient) return;
+
 
     const {
       data: { session }
-    } = await supabaseClient.auth.getSession();
+    } =
+      await supabaseClient.auth.getSession();
+
 
     if (session) {
+
       showDashboard();
     }
   }
 
 
   function showDashboard() {
+
     loginCard.classList.add("hidden");
+
     dashboard.classList.remove("hidden");
   }
 
 
   function showLogin() {
+
     dashboard.classList.add("hidden");
+
     loginCard.classList.remove("hidden");
   }
 
 
+  /* LOGIN */
+
   async function login() {
+
     clearMessage(loginMessage);
 
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
+
+    const email =
+      emailInput.value.trim();
+
+    const password =
+      passwordInput.value;
+
 
     if (!email || !password) {
+
       showMessage(
         loginMessage,
         "Please enter your email and password.",
         "error"
       );
+
       return;
     }
 
+
     if (!supabaseClient) {
+
       showMessage(
         loginMessage,
         "Supabase is not ready. Please refresh the page.",
         "error"
       );
+
       return;
     }
 
+
     loginButton.disabled = true;
-    loginButton.textContent = "Logging in...";
+
+    loginButton.textContent =
+      "Logging in...";
+
 
     try {
+
       const { data, error } =
         await supabaseClient.auth.signInWithPassword({
           email: email,
           password: password
         });
 
+
       if (error) {
+
         showMessage(
           loginMessage,
           "Login failed: " + error.message,
           "error"
         );
+
         return;
       }
 
+
       if (!data || !data.session) {
+
         showMessage(
           loginMessage,
           "Login did not create a session. Please try again.",
           "error"
         );
+
         return;
       }
+
 
       showMessage(
         loginMessage,
@@ -447,56 +709,88 @@
         "success"
       );
 
+
       setTimeout(() => {
+
         showDashboard();
+
       }, 300);
 
+
     } catch (error) {
+
       showMessage(
         loginMessage,
         "Login error: " + error.message,
         "error"
       );
+
     } finally {
+
       loginButton.disabled = false;
-      loginButton.textContent = "Login";
+
+      loginButton.textContent =
+        "Login";
     }
   }
 
 
+  /* SEARCH SHIPMENT */
+
   async function searchShipment() {
+
     clearMessage(searchMessage);
+
     clearMessage(saveMessage);
+
+    clearMessage(eventMessage);
+
+    clearMessage(historyMessage);
+
 
     const trackingNumber =
       trackingNumberInput.value.trim();
 
+
     if (!trackingNumber) {
+
       showMessage(
         searchMessage,
         "Please enter a tracking number.",
         "error"
       );
+
       return;
     }
 
+
     searchButton.disabled = true;
-    searchButton.textContent = "Searching...";
+
+    searchButton.textContent =
+      "Searching...";
+
 
     try {
+
       const {
         data: { session }
-      } = await supabaseClient.auth.getSession();
+      } =
+        await supabaseClient.auth.getSession();
+
 
       if (!session) {
+
         showLogin();
+
         showMessage(
           loginMessage,
           "Your session has expired. Please log in again.",
           "error"
         );
+
         return;
       }
+
 
       const { data, error } =
         await supabaseClient
@@ -505,59 +799,111 @@
           .eq("tracking_number", trackingNumber)
           .maybeSingle();
 
+
       if (error) {
+
         showMessage(
           searchMessage,
           "Search failed: " + error.message,
           "error"
         );
+
         return;
       }
 
+
       if (!data) {
+
         shipmentSection.classList.add("hidden");
+
+        eventCard.classList.add("hidden");
+
+        historyCard.classList.add("hidden");
+
 
         showMessage(
           searchMessage,
-          "No shipment found for " + trackingNumber + ".",
+          "No shipment found for " +
+            trackingNumber +
+            ".",
           "error"
         );
+
         return;
       }
 
+
       currentShipment = data;
 
+
       shipmentInfo.innerHTML = `
+
         <strong>Tracking Number:</strong>
-        ${escapeHtml(data.tracking_number || "-")}<br>
+        ${escapeHtml(data.tracking_number || "-")}
+        <br>
 
         <strong>Receiver:</strong>
-        ${escapeHtml(data.receiver_name || "-")}<br>
+        ${escapeHtml(data.receiver_name || "-")}
+        <br>
 
         <strong>Origin:</strong>
-        ${escapeHtml(data.origin_address || "-")}<br>
+        ${escapeHtml(data.origin_address || "-")}
+        <br>
 
         <strong>Destination:</strong>
         ${escapeHtml(data.destination_address || "-")}
+
       `;
+
 
       statusInput.value =
         data.status || "Shipment Created";
 
+
       currentLocationInput.value =
         data.current_location || "";
+
 
       progressInput.value =
         data.progress_percent ?? 0;
 
+
       if (data.estimated_delivery) {
+
         estimatedDeliveryInput.value =
-          String(data.estimated_delivery).substring(0, 10);
+          String(data.estimated_delivery)
+            .substring(0, 10);
+
       } else {
+
         estimatedDeliveryInput.value = "";
       }
 
+
+      /* PRE-FILL EVENT FORM */
+
+      eventStatusInput.value =
+        data.status || "Shipment Created";
+
+
+      eventLocationInput.value =
+        data.current_location || "";
+
+
+      eventDescriptionInput.value = "";
+
+
+      eventLatitudeInput.value = "";
+
+      eventLongitudeInput.value = "";
+
+
       shipmentSection.classList.remove("hidden");
+
+      eventCard.classList.remove("hidden");
+
+      historyCard.classList.remove("hidden");
+
 
       showMessage(
         searchMessage,
@@ -565,52 +911,90 @@
         "success"
       );
 
+
+      await loadTrackingHistory();
+
+
     } catch (error) {
+
       showMessage(
         searchMessage,
         "Search error: " + error.message,
         "error"
       );
+
     } finally {
+
       searchButton.disabled = false;
-      searchButton.textContent = "Search Shipment";
+
+      searchButton.textContent =
+        "Search Shipment";
     }
   }
 
 
+  /* SAVE SHIPMENT */
+
   async function saveShipment() {
+
     clearMessage(saveMessage);
 
+
     if (!currentShipment) {
+
       showMessage(
         saveMessage,
         "Please search for a shipment first.",
         "error"
       );
+
       return;
     }
 
-    let progress = Number(progressInput.value);
+
+    let progress =
+      Number(progressInput.value);
+
 
     if (Number.isNaN(progress)) {
+
       progress = 0;
     }
 
-    progress = Math.max(0, Math.min(100, progress));
+
+    progress =
+      Math.max(
+        0,
+        Math.min(100, progress)
+      );
+
 
     saveButton.disabled = true;
-    saveButton.textContent = "Saving...";
+
+    saveButton.textContent =
+      "Saving...";
+
 
     try {
+
       const updateData = {
-        status: statusInput.value,
+
+        status:
+          statusInput.value,
+
         current_location:
           currentLocationInput.value.trim() || null,
-        progress_percent: progress,
+
+        progress_percent:
+          progress,
+
         estimated_delivery:
           estimatedDeliveryInput.value || null,
-        updated_at: new Date().toISOString()
+
+        updated_at:
+          new Date().toISOString()
       };
+
 
       const { error } =
         await supabaseClient
@@ -618,19 +1002,24 @@
           .update(updateData)
           .eq("id", currentShipment.id);
 
+
       if (error) {
+
         showMessage(
           saveMessage,
           "Save failed: " + error.message,
           "error"
         );
+
         return;
       }
+
 
       currentShipment = {
         ...currentShipment,
         ...updateData
       };
+
 
       showMessage(
         saveMessage,
@@ -638,59 +1027,421 @@
         "success"
       );
 
+
+      /* Keep event form synchronized */
+
+      eventStatusInput.value =
+        updateData.status ||
+        "Shipment Created";
+
+
+      eventLocationInput.value =
+        updateData.current_location ||
+        "";
+
+
     } catch (error) {
+
       showMessage(
         saveMessage,
         "Save error: " + error.message,
         "error"
       );
+
     } finally {
+
       saveButton.disabled = false;
-      saveButton.textContent = "Save Shipment Update";
+
+      saveButton.textContent =
+        "Save Shipment Update";
     }
   }
 
 
+  /* ADD TRACKING EVENT */
+
+  async function addTrackingEvent() {
+
+    clearMessage(eventMessage);
+
+
+    if (!currentShipment) {
+
+      showMessage(
+        eventMessage,
+        "Please search for a shipment first.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    const status =
+      eventStatusInput.value;
+
+
+    const location =
+      eventLocationInput.value.trim() ||
+      null;
+
+
+    const description =
+      eventDescriptionInput.value.trim() ||
+      null;
+
+
+    const latitudeText =
+      eventLatitudeInput.value.trim();
+
+
+    const longitudeText =
+      eventLongitudeInput.value.trim();
+
+
+    let latitude = null;
+    let longitude = null;
+
+
+    if (latitudeText !== "") {
+
+      latitude =
+        Number(latitudeText);
+
+
+      if (Number.isNaN(latitude)) {
+
+        showMessage(
+          eventMessage,
+          "Latitude must be a valid number.",
+          "error"
+        );
+
+        return;
+      }
+    }
+
+
+    if (longitudeText !== "") {
+
+      longitude =
+        Number(longitudeText);
+
+
+      if (Number.isNaN(longitude)) {
+
+        showMessage(
+          eventMessage,
+          "Longitude must be a valid number.",
+          "error"
+        );
+
+        return;
+      }
+    }
+
+
+    addEventButton.disabled = true;
+
+    addEventButton.textContent =
+      "Adding Event...";
+
+
+    try {
+
+      const eventData = {
+
+        shipment_id:
+          currentShipment.id,
+
+        status:
+          status,
+
+        location:
+          location,
+
+        description:
+          description,
+
+        latitude:
+          latitude,
+
+        longitude:
+          longitude,
+
+        is_demo:
+          currentShipment.is_demo ?? false
+      };
+
+
+      const { error } =
+        await supabaseClient
+          .from("tracking_events")
+          .insert(eventData);
+
+
+      if (error) {
+
+        showMessage(
+          eventMessage,
+          "Event failed: " + error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      showMessage(
+        eventMessage,
+        "Tracking event added successfully.",
+        "success"
+      );
+
+
+      /* Clear description and coordinates */
+
+      eventDescriptionInput.value = "";
+
+      eventLatitudeInput.value = "";
+
+      eventLongitudeInput.value = "";
+
+
+      /* Refresh history */
+
+      await loadTrackingHistory();
+
+
+    } catch (error) {
+
+      showMessage(
+        eventMessage,
+        "Event error: " + error.message,
+        "error"
+      );
+
+    } finally {
+
+      addEventButton.disabled = false;
+
+      addEventButton.textContent =
+        "Add Tracking Event";
+    }
+  }
+
+
+  /* LOAD TRACKING HISTORY */
+
+  async function loadTrackingHistory() {
+
+    if (!currentShipment) return;
+
+
+    clearMessage(historyMessage);
+
+
+    eventHistory.innerHTML =
+      "<p>Loading tracking history...</p>";
+
+
+    try {
+
+      const { data, error } =
+        await supabaseClient
+          .from("tracking_events")
+          .select("*")
+          .eq("shipment_id", currentShipment.id)
+          .order("created_at", {
+            ascending: false
+          });
+
+
+      if (error) {
+
+        eventHistory.innerHTML = "";
+
+        showMessage(
+          historyMessage,
+          "Could not load tracking history: " +
+            error.message,
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (!data || data.length === 0) {
+
+        eventHistory.innerHTML =
+          "<p>No tracking events yet.</p>";
+
+        return;
+      }
+
+
+      eventHistory.innerHTML =
+        data.map(event => {
+
+          const eventDate =
+            event.created_at
+              ? new Date(event.created_at)
+                  .toLocaleString()
+              : "-";
+
+
+          return `
+
+            <div class="event">
+
+              <div class="event-status">
+                ${escapeHtml(event.status || "-")}
+              </div>
+
+              ${
+                event.location
+                  ? `
+                    <div class="event-location">
+                      📍 ${escapeHtml(event.location)}
+                    </div>
+                  `
+                  : ""
+              }
+
+              ${
+                event.description
+                  ? `
+                    <div class="event-description">
+                      ${escapeHtml(event.description)}
+                    </div>
+                  `
+                  : ""
+              }
+
+              <div class="event-time">
+                ${escapeHtml(eventDate)}
+              </div>
+
+            </div>
+
+          `;
+
+        }).join("");
+
+
+    } catch (error) {
+
+      eventHistory.innerHTML = "";
+
+      showMessage(
+        historyMessage,
+        "History error: " + error.message,
+        "error"
+      );
+    }
+  }
+
+
+  /* LOGOUT */
+
   async function logout() {
+
     if (supabaseClient) {
+
       await supabaseClient.auth.signOut();
     }
 
+
     currentShipment = null;
+
+
     shipmentSection.classList.add("hidden");
+
+    eventCard.classList.add("hidden");
+
+    historyCard.classList.add("hidden");
+
+
     trackingNumberInput.value = "";
+
+
+    eventHistory.innerHTML = "";
+
+
     showLogin();
   }
 
 
+  /* SECURITY */
+
   function escapeHtml(value) {
+
     return String(value)
+
       .replaceAll("&", "&amp;")
+
       .replaceAll("<", "&lt;")
+
       .replaceAll(">", "&gt;")
+
       .replaceAll('"', "&quot;")
+
       .replaceAll("'", "&#039;");
   }
 
 
-  loginButton.addEventListener("click", login);
+  /* BUTTON EVENTS */
 
-  passwordInput.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      login();
+  loginButton.addEventListener(
+    "click",
+    login
+  );
+
+
+  passwordInput.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (event.key === "Enter") {
+
+        login();
+      }
     }
-  });
+  );
 
-  searchButton.addEventListener("click", searchShipment);
 
-  saveButton.addEventListener("click", saveShipment);
+  searchButton.addEventListener(
+    "click",
+    searchShipment
+  );
 
-  logoutButton.addEventListener("click", logout);
 
+  saveButton.addEventListener(
+    "click",
+    saveShipment
+  );
+
+
+  addEventButton.addEventListener(
+    "click",
+    addTrackingEvent
+  );
+
+
+  logoutButton.addEventListener(
+    "click",
+    logout
+  );
+
+
+  /* START */
 
   if (startSupabase()) {
+
     checkExistingSession();
   }
+
 </script>
 
 </body>
