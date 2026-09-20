@@ -31,8 +31,6 @@
       margin: auto;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 15px;
     }
 
     .brand {
@@ -234,10 +232,15 @@
   </header>
 
   <section class="hero">
+
     <h1>Track Your Shipment</h1>
-    <p>Enter your tracking number to view the latest shipment information.</p>
+
+    <p>
+      Enter your tracking number to view the latest shipment information.
+    </p>
 
     <form class="tracking-box" id="trackingForm">
+
       <input
         id="trackingNumber"
         type="text"
@@ -245,8 +248,13 @@
         autocomplete="off"
         required
       >
-      <button id="trackButton" type="submit">Track Shipment</button>
+
+      <button id="trackButton" type="submit">
+        Track Shipment
+      </button>
+
     </form>
+
   </section>
 
   <main>
@@ -256,9 +264,12 @@
     <section id="result" class="hidden">
 
       <div class="card">
+
         <h2>Shipment Details</h2>
 
-        <div id="status" class="status">In Transit</div>
+        <div id="status" class="status">
+          In Transit
+        </div>
 
         <div class="details">
 
@@ -289,15 +300,21 @@
 
           <div class="detail">
             <div class="detail-label">Carrier</div>
-            <div class="detail-value" id="carrierValue">SwiftDrop Express</div>
+            <div class="detail-value">
+              SwiftDrop Express
+            </div>
           </div>
 
         </div>
+
       </div>
 
       <div class="card">
+
         <h2>Tracking History</h2>
+
         <div id="timeline" class="timeline"></div>
+
       </div>
 
     </section>
@@ -311,28 +328,46 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const SUPABASE_URL = "https://vhwubwndtprchiwyvaxr.supabase.co";
+
+    const SUPABASE_URL =
+      "https://vhwubwndtprchiwyvaxr.supabase.co";
 
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_ew7AMBuWsEnIN7DX-yDesQ_toD2QZ8V";
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+    const supabase =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
 
-    const form = document.getElementById("trackingForm");
-    const input = document.getElementById("trackingNumber");
-    const button = document.getElementById("trackButton");
-    const message = document.getElementById("message");
-    const result = document.getElementById("result");
+    const form =
+      document.getElementById("trackingForm");
+
+    const input =
+      document.getElementById("trackingNumber");
+
+    const button =
+      document.getElementById("trackButton");
+
+    const message =
+      document.getElementById("message");
+
+    const result =
+      document.getElementById("result");
+
 
     function showMessage(text, isError = false) {
+
       message.textContent = text;
-      message.style.color = isError ? "#c0392b" : "#14834d";
+
+      message.style.color =
+        isError ? "#c0392b" : "#14834d";
     }
 
+
     function formatDate(value) {
+
       if (!value) return "-";
 
       const date = new Date(value);
@@ -350,10 +385,15 @@
       });
     }
 
+
     function findValue(obj, names) {
-      if (!obj || typeof obj !== "object") return null;
+
+      if (!obj || typeof obj !== "object") {
+        return null;
+      }
 
       for (const name of names) {
+
         if (
           obj[name] !== undefined &&
           obj[name] !== null &&
@@ -361,10 +401,12 @@
         ) {
           return obj[name];
         }
+
       }
 
       return null;
     }
+
 
     function displayShipment(data, searchedNumber) {
 
@@ -386,10 +428,17 @@
         );
 
       if (!found) {
+
         result.classList.add("hidden");
-        showMessage("Shipment not found. Please check your tracking number.", true);
+
+        showMessage(
+          "Shipment not found. Please check your tracking number.",
+          true
+        );
+
         return;
       }
+
 
       const tracking =
         findValue(shipment, [
@@ -398,12 +447,14 @@
           "tracking"
         ]) || searchedNumber;
 
+
       const status =
         findValue(shipment, [
           "status",
           "current_status",
           "currentStatus"
         ]) || "In Transit";
+
 
       const origin =
         findValue(shipment, [
@@ -413,6 +464,7 @@
           "from"
         ]) || "-";
 
+
       const destination =
         findValue(shipment, [
           "destination",
@@ -420,6 +472,7 @@
           "destinationLocation",
           "to"
         ]) || "-";
+
 
       const delivery =
         findValue(shipment, [
@@ -429,14 +482,25 @@
           "deliveryDate"
         ]);
 
-      document.getElementById("trackingValue").textContent = tracking;
-      document.getElementById("statusValue").textContent = status;
-      document.getElementById("originValue").textContent = origin;
-      document.getElementById("destinationValue").textContent = destination;
+
+      document.getElementById("trackingValue").textContent =
+        tracking;
+
+      document.getElementById("statusValue").textContent =
+        status;
+
+      document.getElementById("originValue").textContent =
+        origin;
+
+      document.getElementById("destinationValue").textContent =
+        destination;
+
       document.getElementById("deliveryValue").textContent =
         delivery ? formatDate(delivery) : "-";
 
-      document.getElementById("status").textContent = status;
+      document.getElementById("status").textContent =
+        status;
+
 
       const events =
         data.tracking_events ||
@@ -445,11 +509,17 @@
         shipment.trackingEvents ||
         [];
 
-      const timeline = document.getElementById("timeline");
+
+      const timeline =
+        document.getElementById("timeline");
 
       timeline.innerHTML = "";
 
-      if (Array.isArray(events) && events.length > 0) {
+
+      if (
+        Array.isArray(events) &&
+        events.length > 0
+      ) {
 
         events.forEach(event => {
 
@@ -461,6 +531,7 @@
               "location"
             ]) || "Shipment update";
 
+
           const date =
             findValue(event, [
               "created_at",
@@ -470,92 +541,171 @@
               "timestamp"
             ]);
 
+
           const location =
             findValue(event, [
               "location",
               "city"
             ]);
 
-          const div = document.createElement("div");
+
+          const div =
+            document.createElement("div");
 
           div.className = "event";
 
-          div.innerHTML = `
-            <div class="event-title">${title}</div>
-            ${location ? `<div>${location}</div>` : ""}
-            <div class="event-date">${formatDate(date)}</div>
-          `;
+
+          const titleDiv =
+            document.createElement("div");
+
+          titleDiv.className = "event-title";
+          titleDiv.textContent = title;
+
+
+          if (location) {
+
+            const locationDiv =
+              document.createElement("div");
+
+            locationDiv.textContent = location;
+
+            div.appendChild(locationDiv);
+          }
+
+
+          const dateDiv =
+            document.createElement("div");
+
+          dateDiv.className = "event-date";
+          dateDiv.textContent = formatDate(date);
+
+
+          div.appendChild(titleDiv);
+          div.appendChild(dateDiv);
 
           timeline.appendChild(div);
+
         });
 
       } else {
 
-        timeline.innerHTML = `
-          <div class="event">
-            <div class="event-title">${status}</div>
-            <div class="event-date">Latest shipment status</div>
-          </div>
-        `;
+        const div =
+          document.createElement("div");
+
+        div.className = "event";
+
+
+        const titleDiv =
+          document.createElement("div");
+
+        titleDiv.className = "event-title";
+        titleDiv.textContent = status;
+
+
+        const dateDiv =
+          document.createElement("div");
+
+        dateDiv.className = "event-date";
+        dateDiv.textContent =
+          "Latest shipment status";
+
+
+        div.appendChild(titleDiv);
+        div.appendChild(dateDiv);
+
+        timeline.appendChild(div);
       }
+
 
       result.classList.remove("hidden");
 
-      showMessage("Shipment information found.");
+      showMessage(
+        "Shipment information found."
+      );
     }
 
-    form.addEventListener("submit", async function(event) {
 
-      event.preventDefault();
+    form.addEventListener(
+      "submit",
+      async function(event) {
 
-      const trackingNumber = input.value.trim();
+        event.preventDefault();
 
-      if (!trackingNumber) {
-        showMessage("Please enter a tracking number.", true);
-        return;
-      }
+        const trackingNumber =
+          input.value.trim();
 
-      button.disabled = true;
-      button.textContent = "Tracking...";
-      result.classList.add("hidden");
-      message.textContent = "";
 
-      try {
+        if (!trackingNumber) {
 
-        const { data, error } = await supabase.rpc(
-          "get_tracking_info",
-          {
-            text: trackingNumber
-          }
-        );
-
-        if (error) {
-          console.error(error);
           showMessage(
-            "Unable to retrieve shipment information. Please try again.",
+            "Please enter a tracking number.",
             true
           );
+
           return;
         }
 
-        displayShipment(data, trackingNumber);
 
-      } catch (error) {
+        button.disabled = true;
+        button.textContent = "Tracking...";
 
-        console.error(error);
+        result.classList.add("hidden");
 
-        showMessage(
-          "Connection error. Please try again.",
-          true
-        );
+        message.textContent = "";
 
-      } finally {
 
-        button.disabled = false;
-        button.textContent = "Track Shipment";
+        try {
+
+          const { data, error } =
+            await supabase.rpc(
+              "get_tracking_info",
+              {
+                p_tracking_number:
+                  trackingNumber
+              }
+            );
+
+
+          if (error) {
+
+            console.error(error);
+
+            showMessage(
+              "Unable to retrieve shipment information. Please try again.",
+              true
+            );
+
+            return;
+          }
+
+
+          displayShipment(
+            data,
+            trackingNumber
+          );
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          showMessage(
+            "Connection error. Please try again.",
+            true
+          );
+
+
+        } finally {
+
+          button.disabled = false;
+
+          button.textContent =
+            "Track Shipment";
+        }
 
       }
-    });
+    );
+
   </script>
 
 </body>
