@@ -4,150 +4,182 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>SwiftDrop Express | Shipment Tracking</title>
+  <title>SwiftDrop Express | Track Your Shipment</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
 
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #f4f7f9;
-      color: #17212b;
-      min-height: 100vh;
+      background: #f4f7fb;
+      color: #172033;
     }
 
     header {
-      background: #ffffff;
-      border-bottom: 1px solid #e5e9ed;
-      padding: 18px 20px;
+      background: #0b1f3a;
+      color: white;
+      padding: 22px 20px;
+      text-align: center;
     }
 
-    .header-inner {
-      max-width: 900px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-    }
-
-    .brand {
-      font-size: 22px;
+    .logo {
+      font-size: 28px;
       font-weight: 800;
-      color: #111827;
+      letter-spacing: 0.5px;
     }
 
-    .brand span {
-      color: #20b26b;
+    .tagline {
+      margin-top: 6px;
+      font-size: 14px;
+      opacity: 0.85;
     }
 
     .hero {
-      background: #111827;
+      background: linear-gradient(135deg, #0b1f3a, #164b86);
       color: white;
       padding: 55px 20px 65px;
       text-align: center;
     }
 
     .hero h1 {
-      font-size: 36px;
-      margin-bottom: 12px;
+      margin: 0 0 12px;
+      font-size: 38px;
     }
 
     .hero p {
-      color: #cbd5e1;
-      font-size: 16px;
-      margin-bottom: 30px;
+      margin: 0 auto 28px;
+      max-width: 600px;
+      line-height: 1.6;
+      opacity: 0.9;
     }
 
     .tracking-box {
       max-width: 650px;
       margin: auto;
       background: white;
-      padding: 8px;
-      border-radius: 12px;
+      padding: 10px;
+      border-radius: 14px;
       display: flex;
-      gap: 8px;
+      gap: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
     }
 
     .tracking-box input {
       flex: 1;
-      border: none;
+      border: 0;
       outline: none;
       padding: 16px;
       font-size: 16px;
-      color: #111827;
+      border-radius: 10px;
+      color: #172033;
       min-width: 0;
     }
 
     .tracking-box button {
-      border: none;
-      background: #20b26b;
+      border: 0;
+      background: #ff8a00;
       color: white;
       font-weight: 700;
       padding: 0 25px;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 10px;
       cursor: pointer;
+      font-size: 16px;
     }
 
     .tracking-box button:disabled {
       opacity: 0.6;
+      cursor: wait;
     }
 
-    main {
+    .container {
       max-width: 900px;
-      margin: 35px auto;
+      margin: 40px auto;
       padding: 0 20px;
     }
 
     #message {
-      text-align: center;
+      display: none;
+      padding: 16px;
+      border-radius: 10px;
       margin-bottom: 20px;
-      font-weight: 600;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message-info {
+      display: block !important;
+      background: #e8f1ff;
+      color: #164b86;
+    }
+
+    .message-error {
+      display: block !important;
+      background: #ffe9e9;
+      color: #a30000;
+    }
+
+    .message-success {
+      display: block !important;
+      background: #e8f8ee;
+      color: #126b3a;
+    }
+
+    #result {
+      display: none;
     }
 
     .card {
       background: white;
-      border-radius: 14px;
-      padding: 25px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      border-radius: 16px;
+      padding: 24px;
       margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.07);
     }
 
     .card h2 {
-      margin-bottom: 20px;
-      font-size: 21px;
+      margin-top: 0;
+      color: #0b1f3a;
+    }
+
+    .tracking-number {
+      font-size: 20px;
+      font-weight: 700;
+      word-break: break-word;
     }
 
     .status {
       display: inline-block;
-      background: #e8f8f0;
-      color: #14834d;
+      margin-top: 12px;
       padding: 8px 14px;
-      border-radius: 30px;
+      border-radius: 20px;
+      background: #e8f8ee;
+      color: #126b3a;
       font-weight: 700;
-      margin-bottom: 20px;
     }
 
     .details {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
+      gap: 15px;
+      margin-top: 20px;
     }
 
     .detail {
-      border-bottom: 1px solid #edf0f2;
-      padding-bottom: 12px;
+      background: #f6f8fb;
+      padding: 15px;
+      border-radius: 10px;
     }
 
     .detail-label {
       font-size: 12px;
-      color: #7b8794;
+      color: #6c7480;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+      font-weight: 700;
     }
 
     .detail-value {
@@ -157,55 +189,59 @@
     }
 
     .timeline {
-      margin-top: 10px;
+      margin-top: 20px;
     }
 
     .event {
+      border-left: 3px solid #164b86;
+      padding: 0 0 20px 20px;
+      margin-left: 8px;
       position: relative;
-      padding: 0 0 25px 28px;
-      border-left: 2px solid #d9e2e8;
-      margin-left: 7px;
     }
 
     .event:last-child {
-      border-left: none;
+      padding-bottom: 0;
     }
 
     .event::before {
       content: "";
       position: absolute;
-      left: -7px;
-      top: 0;
-      width: 12px;
-      height: 12px;
-      background: #20b26b;
+      width: 11px;
+      height: 11px;
+      background: #ff8a00;
       border-radius: 50%;
+      left: -7px;
+      top: 2px;
     }
 
-    .event-title {
+    .event-status {
       font-weight: 700;
-      margin-bottom: 4px;
+      color: #0b1f3a;
     }
 
     .event-date {
-      color: #7b8794;
       font-size: 13px;
+      color: #707985;
+      margin-top: 4px;
     }
 
-    .hidden {
-      display: none;
+    .event-location {
+      margin-top: 5px;
+      color: #404957;
     }
 
     footer {
+      margin-top: 60px;
+      background: #0b1f3a;
+      color: white;
       text-align: center;
-      color: #7b8794;
       padding: 30px 20px;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     @media (max-width: 600px) {
       .hero h1 {
-        font-size: 29px;
+        font-size: 30px;
       }
 
       .tracking-box {
@@ -225,488 +261,476 @@
 
 <body>
 
-  <header>
-    <div class="header-inner">
-      <div class="brand">SwiftDrop <span>Express</span></div>
+<header>
+  <div class="logo">SwiftDrop Express</div>
+  <div class="tagline">Fast. Reliable. Delivered.</div>
+</header>
+
+<section class="hero">
+  <h1>Track Your Shipment</h1>
+
+  <p>
+    Enter your SwiftDrop Express tracking number below
+    to see the latest shipment information.
+  </p>
+
+  <div class="tracking-box">
+    <input
+      id="trackingNumber"
+      type="text"
+      placeholder="Enter tracking number"
+      autocomplete="off"
+    >
+
+    <button id="trackButton" type="button">
+      Track Shipment
+    </button>
+  </div>
+</section>
+
+<main class="container">
+
+  <div id="message"></div>
+
+  <div id="result">
+
+    <div class="card">
+      <h2>Shipment Details</h2>
+
+      <div class="tracking-number" id="displayTracking">
+        -
+      </div>
+
+      <div class="status" id="displayStatus">
+        -
+      </div>
+
+      <div class="details">
+
+        <div class="detail">
+          <div class="detail-label">Origin</div>
+          <div class="detail-value" id="displayOrigin">-</div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">Destination</div>
+          <div class="detail-value" id="displayDestination">-</div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">Estimated Delivery</div>
+          <div class="detail-value" id="displayDelivery">-</div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">Carrier</div>
+          <div class="detail-value">SwiftDrop Express</div>
+        </div>
+
+      </div>
     </div>
-  </header>
 
-  <section class="hero">
-
-    <h1>Track Your Shipment</h1>
-
-    <p>
-      Enter your tracking number to view the latest shipment information.
-    </p>
-
-    <form class="tracking-box" id="trackingForm">
-
-      <input
-        id="trackingNumber"
-        type="text"
-        placeholder="Enter tracking number"
-        autocomplete="off"
-        required
-      >
-
-      <button id="trackButton" type="submit">
-        Track Shipment
-      </button>
-
-    </form>
-
-  </section>
-
-  <main>
-
-    <div id="message"></div>
-
-    <section id="result" class="hidden">
-
-      <div class="card">
-
-        <h2>Shipment Details</h2>
-
-        <div id="status" class="status">
-          In Transit
-        </div>
-
-        <div class="details">
-
-          <div class="detail">
-            <div class="detail-label">Tracking Number</div>
-            <div class="detail-value" id="trackingValue">-</div>
-          </div>
-
-          <div class="detail">
-            <div class="detail-label">Status</div>
-            <div class="detail-value" id="statusValue">-</div>
-          </div>
-
-          <div class="detail">
-            <div class="detail-label">Origin</div>
-            <div class="detail-value" id="originValue">-</div>
-          </div>
-
-          <div class="detail">
-            <div class="detail-label">Destination</div>
-            <div class="detail-value" id="destinationValue">-</div>
-          </div>
-
-          <div class="detail">
-            <div class="detail-label">Estimated Delivery</div>
-            <div class="detail-value" id="deliveryValue">-</div>
-          </div>
-
-          <div class="detail">
-            <div class="detail-label">Carrier</div>
-            <div class="detail-value">
-              SwiftDrop Express
-            </div>
-          </div>
-
-        </div>
-
+    <div class="card">
+      <h2>Tracking History</h2>
+      <div class="timeline" id="timeline">
+        No tracking events available.
       </div>
+    </div>
 
-      <div class="card">
+  </div>
 
-        <h2>Tracking History</h2>
+</main>
 
-        <div id="timeline" class="timeline"></div>
+<footer>
+  © 2026 SwiftDrop Express. All rights reserved.
+</footer>
 
-      </div>
+<script>
+  const SUPABASE_URL =
+    "https://vhwubwndtprchiwyvaxr.supabase.co";
 
-    </section>
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_ew7AMBuWsEnIN7DX-yDesQ_toD2QZ8V";
 
-  </main>
+  const trackingInput =
+    document.getElementById("trackingNumber");
 
-  <footer>
-    © 2026 SwiftDrop Express. All rights reserved.
-  </footer>
+  const trackButton =
+    document.getElementById("trackButton");
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  const message =
+    document.getElementById("message");
 
-  <script>
+  const result =
+    document.getElementById("result");
 
-    const SUPABASE_URL =
-      "https://vhwubwndtprchiwyvaxr.supabase.co";
+  function showMessage(text, type) {
+    message.textContent = text;
+    message.className = "";
 
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_ew7AMBuWsEnIN7DX-yDesQ_toD2QZ8V";
+    if (type === "error") {
+      message.classList.add("message-error");
+    } else if (type === "success") {
+      message.classList.add("message-success");
+    } else {
+      message.classList.add("message-info");
+    }
+  }
 
-    const supabase =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
+  function hideMessage() {
+    message.textContent = "";
+    message.className = "";
+  }
 
-    const form =
-      document.getElementById("trackingForm");
-
-    const input =
-      document.getElementById("trackingNumber");
-
-    const button =
-      document.getElementById("trackButton");
-
-    const message =
-      document.getElementById("message");
-
-    const result =
-      document.getElementById("result");
-
-
-    function showMessage(text, isError = false) {
-
-      message.textContent = text;
-
-      message.style.color =
-        isError ? "#c0392b" : "#14834d";
+  function valueFrom(object, names) {
+    if (!object || typeof object !== "object") {
+      return "";
     }
 
+    for (const name of names) {
+      if (
+        object[name] !== undefined &&
+        object[name] !== null &&
+        object[name] !== ""
+      ) {
+        return object[name];
+      }
+    }
 
-    function formatDate(value) {
+    return "";
+  }
 
-      if (!value) return "-";
+  function formatDate(value) {
+    if (!value) {
+      return "-";
+    }
 
+    try {
       const date = new Date(value);
 
-      if (isNaN(date.getTime())) {
-        return value;
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString();
       }
-
-      return date.toLocaleString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-      });
+    } catch (error) {
+      // Keep original value.
     }
 
+    return String(value);
+  }
 
-    function findValue(obj, names) {
+  function renderEvents(events) {
+    const timeline =
+      document.getElementById("timeline");
 
-      if (!obj || typeof obj !== "object") {
-        return null;
-      }
+    timeline.textContent = "";
 
-      for (const name of names) {
-
-        if (
-          obj[name] !== undefined &&
-          obj[name] !== null &&
-          obj[name] !== ""
-        ) {
-          return obj[name];
-        }
-
-      }
-
-      return null;
+    if (!Array.isArray(events) || events.length === 0) {
+      timeline.textContent =
+        "No tracking events available.";
+      return;
     }
 
+    events.forEach(function(event) {
+      const item = document.createElement("div");
+      item.className = "event";
 
-    function displayShipment(data, searchedNumber) {
+      const status = document.createElement("div");
+      status.className = "event-status";
 
-      let shipment = data;
-
-      if (data && data.shipment) {
-        shipment = data.shipment;
-      }
-
-      if (Array.isArray(data)) {
-        shipment = data[0] || {};
-      }
-
-      const found =
-        data &&
-        (
-          data.found === true ||
-          data.found === undefined
-        );
-
-      if (!found) {
-
-        result.classList.add("hidden");
-
-        showMessage(
-          "Shipment not found. Please check your tracking number.",
-          true
-        );
-
-        return;
-      }
-
-
-      const tracking =
-        findValue(shipment, [
-          "tracking_number",
-          "trackingNumber",
-          "tracking"
-        ]) || searchedNumber;
-
-
-      const status =
-        findValue(shipment, [
+      status.textContent =
+        valueFrom(event, [
           "status",
-          "current_status",
-          "currentStatus"
-        ]) || "In Transit";
+          "event_status",
+          "description",
+          "event"
+        ]) || "Shipment update";
 
+      const date = document.createElement("div");
+      date.className = "event-date";
 
-      const origin =
-        findValue(shipment, [
-          "origin",
-          "origin_location",
-          "originLocation",
-          "from"
-        ]) || "-";
+      date.textContent =
+        formatDate(
+          valueFrom(event, [
+            "event_time",
+            "timestamp",
+            "created_at",
+            "date",
+            "updated_at"
+          ])
+        );
 
+      const location = document.createElement("div");
+      location.className = "event-location";
 
-      const destination =
-        findValue(shipment, [
-          "destination",
-          "destination_location",
-          "destinationLocation",
-          "to"
-        ]) || "-";
-
-
-      const delivery =
-        findValue(shipment, [
-          "estimated_delivery",
-          "estimatedDelivery",
-          "delivery_date",
-          "deliveryDate"
+      const locationValue =
+        valueFrom(event, [
+          "location",
+          "city",
+          "current_location"
         ]);
 
+      location.textContent =
+        locationValue
+          ? String(locationValue)
+          : "";
 
-      document.getElementById("trackingValue").textContent =
-        tracking;
+      item.appendChild(status);
+      item.appendChild(date);
 
-      document.getElementById("statusValue").textContent =
-        status;
-
-      document.getElementById("originValue").textContent =
-        origin;
-
-      document.getElementById("destinationValue").textContent =
-        destination;
-
-      document.getElementById("deliveryValue").textContent =
-        delivery ? formatDate(delivery) : "-";
-
-      document.getElementById("status").textContent =
-        status;
-
-
-      const events =
-        data.tracking_events ||
-        data.trackingEvents ||
-        shipment.tracking_events ||
-        shipment.trackingEvents ||
-        [];
-
-
-      const timeline =
-        document.getElementById("timeline");
-
-      timeline.innerHTML = "";
-
-
-      if (
-        Array.isArray(events) &&
-        events.length > 0
-      ) {
-
-        events.forEach(event => {
-
-          const title =
-            findValue(event, [
-              "status",
-              "description",
-              "event",
-              "location"
-            ]) || "Shipment update";
-
-
-          const date =
-            findValue(event, [
-              "created_at",
-              "createdAt",
-              "event_time",
-              "eventTime",
-              "timestamp"
-            ]);
-
-
-          const location =
-            findValue(event, [
-              "location",
-              "city"
-            ]);
-
-
-          const div =
-            document.createElement("div");
-
-          div.className = "event";
-
-
-          const titleDiv =
-            document.createElement("div");
-
-          titleDiv.className = "event-title";
-          titleDiv.textContent = title;
-
-
-          if (location) {
-
-            const locationDiv =
-              document.createElement("div");
-
-            locationDiv.textContent = location;
-
-            div.appendChild(locationDiv);
-          }
-
-
-          const dateDiv =
-            document.createElement("div");
-
-          dateDiv.className = "event-date";
-          dateDiv.textContent = formatDate(date);
-
-
-          div.appendChild(titleDiv);
-          div.appendChild(dateDiv);
-
-          timeline.appendChild(div);
-
-        });
-
-      } else {
-
-        const div =
-          document.createElement("div");
-
-        div.className = "event";
-
-
-        const titleDiv =
-          document.createElement("div");
-
-        titleDiv.className = "event-title";
-        titleDiv.textContent = status;
-
-
-        const dateDiv =
-          document.createElement("div");
-
-        dateDiv.className = "event-date";
-        dateDiv.textContent =
-          "Latest shipment status";
-
-
-        div.appendChild(titleDiv);
-        div.appendChild(dateDiv);
-
-        timeline.appendChild(div);
+      if (locationValue) {
+        item.appendChild(location);
       }
 
+      timeline.appendChild(item);
+    });
+  }
 
-      result.classList.remove("hidden");
+  function renderShipment(data, trackingNumber) {
+    let response = data;
 
-      showMessage(
-        "Shipment information found."
-      );
+    if (typeof response === "string") {
+      try {
+        response = JSON.parse(response);
+      } catch (error) {
+        response = {
+          found: true,
+          shipment: {
+            tracking_number: trackingNumber,
+            status: response
+          }
+        };
+      }
     }
 
+    if (
+      Array.isArray(response) &&
+      response.length === 1
+    ) {
+      response = response[0];
+    }
 
-    form.addEventListener(
-      "submit",
-      async function(event) {
+    if (
+      response &&
+      response.found === false
+    ) {
+      result.style.display = "none";
 
-        event.preventDefault();
+      showMessage(
+        "No shipment was found for tracking number: " +
+        trackingNumber,
+        "error"
+      );
 
-        const trackingNumber =
-          input.value.trim();
+      return;
+    }
 
+    const shipment =
+      response &&
+      response.shipment
+        ? response.shipment
+        : response;
 
-        if (!trackingNumber) {
+    const events =
+      response &&
+      Array.isArray(response.tracking_events)
+        ? response.tracking_events
+        : response &&
+          Array.isArray(response.trackingEvents)
+          ? response.trackingEvents
+          : shipment &&
+            Array.isArray(shipment.tracking_events)
+            ? shipment.tracking_events
+            : [];
 
-          showMessage(
-            "Please enter a tracking number.",
-            true
-          );
+    document.getElementById(
+      "displayTracking"
+    ).textContent =
+      valueFrom(shipment, [
+        "tracking_number",
+        "trackingNumber"
+      ]) || trackingNumber;
 
-          return;
-        }
+    document.getElementById(
+      "displayStatus"
+    ).textContent =
+      valueFrom(shipment, [
+        "status",
+        "shipment_status"
+      ]) || "In Transit";
 
+    document.getElementById(
+      "displayOrigin"
+    ).textContent =
+      valueFrom(shipment, [
+        "origin",
+        "origin_location",
+        "from"
+      ]) || "-";
 
-        button.disabled = true;
-        button.textContent = "Tracking...";
+    document.getElementById(
+      "displayDestination"
+    ).textContent =
+      valueFrom(shipment, [
+        "destination",
+        "destination_location",
+        "to"
+      ]) || "-";
 
-        result.classList.add("hidden");
+    document.getElementById(
+      "displayDelivery"
+    ).textContent =
+      formatDate(
+        valueFrom(shipment, [
+          "estimated_delivery",
+          "estimated_delivery_date",
+          "delivery_date"
+        ])
+      );
 
-        message.textContent = "";
+    renderEvents(events);
 
+    result.style.display = "block";
 
-        try {
+    showMessage(
+      "Shipment found successfully.",
+      "success"
+    );
+  }
 
-          const { data, error } =
-            await supabase.rpc(
-              "get_tracking_info",
-              {
-                p_tracking_number:
-                  trackingNumber
-              }
-            );
+  async function trackShipment() {
+    const trackingNumber =
+      trackingInput.value.trim();
 
+    result.style.display = "none";
+    hideMessage();
 
-          if (error) {
+    if (!trackingNumber) {
+      showMessage(
+        "Please enter a tracking number.",
+        "error"
+      );
 
-            console.error(error);
+      trackingInput.focus();
+      return;
+    }
 
-            showMessage(
-              "Unable to retrieve shipment information. Please try again.",
-              true
-            );
+    trackButton.disabled = true;
+    trackButton.textContent = "Tracking...";
 
-            return;
-          }
-
-
-          displayShipment(
-            data,
-            trackingNumber
-          );
-
-
-        } catch (error) {
-
-          console.error(error);
-
-          showMessage(
-            "Connection error. Please try again.",
-            true
-          );
-
-
-        } finally {
-
-          button.disabled = false;
-
-          button.textContent =
-            "Track Shipment";
-        }
-
-      }
+    showMessage(
+      "Connecting to the SwiftDrop shipment database...",
+      "info"
     );
 
-  </script>
+    const controller =
+      new AbortController();
+
+    const timeout =
+      setTimeout(function() {
+        controller.abort();
+      }, 20000);
+
+    try {
+      const response =
+        await fetch(
+          SUPABASE_URL +
+          "/rest/v1/rpc/get_tracking_info",
+          {
+            method: "POST",
+
+            headers: {
+              "apikey":
+                SUPABASE_PUBLISHABLE_KEY,
+
+              "Authorization":
+                "Bearer " +
+                SUPABASE_PUBLISHABLE_KEY,
+
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              p_tracking_number:
+                trackingNumber
+            }),
+
+            cache: "no-store",
+
+            signal: controller.signal
+          }
+        );
+
+      const responseText =
+        await response.text();
+
+      if (!response.ok) {
+        throw new Error(
+          "Supabase returned HTTP " +
+          response.status +
+          "\n\n" +
+          responseText
+        );
+      }
+
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch (error) {
+        throw new Error(
+          "The database returned an unexpected response:\n\n" +
+          responseText
+        );
+      }
+
+      renderShipment(
+        data,
+        trackingNumber
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      if (error.name === "AbortError") {
+        showMessage(
+          "The tracking request timed out. Please try again.",
+          "error"
+        );
+      } else {
+        showMessage(
+          "Tracking connection error:\n\n" +
+          error.message,
+          "error"
+        );
+      }
+
+    } finally {
+
+      clearTimeout(timeout);
+
+      trackButton.disabled = false;
+      trackButton.textContent =
+        "Track Shipment";
+    }
+  }
+
+  trackButton.addEventListener(
+    "click",
+    trackShipment
+  );
+
+  trackingInput.addEventListener(
+    "keydown",
+    function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        trackShipment();
+      }
+    }
+  );
+</script>
 
 </body>
 </html>
