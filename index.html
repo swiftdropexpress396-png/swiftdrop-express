@@ -188,6 +188,41 @@
       word-break: break-word;
     }
 
+    .progress-area {
+      margin-top: 25px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e5e9ef;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #164b86;
+      border-radius: 20px;
+      transition: width 0.5s ease;
+    }
+
+    .update-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #707985;
+      text-align: right;
+    }
+
     .timeline {
       margin-top: 20px;
     }
@@ -267,6 +302,7 @@
 </header>
 
 <section class="hero">
+
   <h1>Track Your Shipment</h1>
 
   <p>
@@ -275,6 +311,7 @@
   </p>
 
   <div class="tracking-box">
+
     <input
       id="trackingNumber"
       type="text"
@@ -285,7 +322,9 @@
     <button id="trackButton" type="button">
       Track Shipment
     </button>
+
   </div>
+
 </section>
 
 <main class="container">
@@ -295,46 +334,161 @@
   <div id="result">
 
     <div class="card">
+
       <h2>Shipment Details</h2>
 
-      <div class="tracking-number" id="displayTracking">
+      <div
+        class="tracking-number"
+        id="displayTracking"
+      >
         -
       </div>
 
-      <div class="status" id="displayStatus">
+      <div
+        class="status"
+        id="displayStatus"
+      >
         -
       </div>
 
       <div class="details">
 
         <div class="detail">
-          <div class="detail-label">Origin</div>
-          <div class="detail-value" id="displayOrigin">-</div>
+          <div class="detail-label">
+            Receiver
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayReceiver"
+          >
+            -
+          </div>
         </div>
 
         <div class="detail">
-          <div class="detail-label">Destination</div>
-          <div class="detail-value" id="displayDestination">-</div>
+          <div class="detail-label">
+            Receiver Email
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayReceiverEmail"
+          >
+            -
+          </div>
         </div>
 
         <div class="detail">
-          <div class="detail-label">Estimated Delivery</div>
-          <div class="detail-value" id="displayDelivery">-</div>
+          <div class="detail-label">
+            Origin
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayOrigin"
+          >
+            -
+          </div>
         </div>
 
         <div class="detail">
-          <div class="detail-label">Carrier</div>
-          <div class="detail-value">SwiftDrop Express</div>
+          <div class="detail-label">
+            Destination
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayDestination"
+          >
+            -
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">
+            Current Location
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayCurrentLocation"
+          >
+            -
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">
+            Estimated Delivery
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayDelivery"
+          >
+            -
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">
+            Carrier
+          </div>
+
+          <div class="detail-value">
+            SwiftDrop Express
+          </div>
+        </div>
+
+        <div class="detail">
+          <div class="detail-label">
+            Last Updated
+          </div>
+
+          <div
+            class="detail-value"
+            id="displayUpdated"
+          >
+            -
+          </div>
         </div>
 
       </div>
+
+      <div class="progress-area">
+
+        <div class="progress-label">
+          <span>Shipment Progress</span>
+          <span id="displayProgress">0%</span>
+        </div>
+
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            id="progressFill"
+          ></div>
+        </div>
+
+        <div class="update-note">
+          Tracking information refreshes automatically every 30 seconds.
+        </div>
+
+      </div>
+
     </div>
 
     <div class="card">
+
       <h2>Tracking History</h2>
-      <div class="timeline" id="timeline">
+
+      <div
+        class="timeline"
+        id="timeline"
+      >
         No tracking events available.
       </div>
+
     </div>
 
   </div>
@@ -346,6 +500,7 @@
 </footer>
 
 <script>
+
   const SUPABASE_URL =
     "https://vhwubwndtprchiwyvaxr.supabase.co";
 
@@ -364,78 +519,135 @@
   const result =
     document.getElementById("result");
 
+  let refreshTimer = null;
+
+  let currentTrackingNumber = "";
+
+
   function showMessage(text, type) {
+
     message.textContent = text;
+
     message.className = "";
 
     if (type === "error") {
-      message.classList.add("message-error");
+
+      message.classList.add(
+        "message-error"
+      );
+
     } else if (type === "success") {
-      message.classList.add("message-success");
+
+      message.classList.add(
+        "message-success"
+      );
+
     } else {
-      message.classList.add("message-info");
+
+      message.classList.add(
+        "message-info"
+      );
+
     }
+
   }
+
 
   function hideMessage() {
+
     message.textContent = "";
+
     message.className = "";
+
   }
 
+
   function valueFrom(object, names) {
-    if (!object || typeof object !== "object") {
+
+    if (
+      !object ||
+      typeof object !== "object"
+    ) {
       return "";
     }
 
     for (const name of names) {
+
       if (
         object[name] !== undefined &&
         object[name] !== null &&
         object[name] !== ""
       ) {
+
         return object[name];
+
       }
+
     }
 
     return "";
+
   }
 
+
   function formatDate(value) {
+
     if (!value) {
       return "-";
     }
 
     try {
+
       const date = new Date(value);
 
       if (!isNaN(date.getTime())) {
+
         return date.toLocaleString();
+
       }
+
     } catch (error) {
       // Keep original value.
     }
 
     return String(value);
+
   }
 
+
   function renderEvents(events) {
+
     const timeline =
       document.getElementById("timeline");
 
     timeline.textContent = "";
 
-    if (!Array.isArray(events) || events.length === 0) {
+    if (
+      !Array.isArray(events) ||
+      events.length === 0
+    ) {
+
       timeline.textContent =
         "No tracking events available.";
+
       return;
+
     }
 
+
     events.forEach(function(event) {
-      const item = document.createElement("div");
+
+      const item =
+        document.createElement("div");
+
       item.className = "event";
 
-      const status = document.createElement("div");
-      status.className = "event-status";
+
+      const status =
+        document.createElement("div");
+
+      status.className =
+        "event-status";
 
       status.textContent =
         valueFrom(event, [
@@ -443,10 +655,15 @@
           "event_status",
           "description",
           "event"
-        ]) || "Shipment update";
+        ]) ||
+        "Shipment update";
 
-      const date = document.createElement("div");
-      date.className = "event-date";
+
+      const date =
+        document.createElement("div");
+
+      date.className =
+        "event-date";
 
       date.textContent =
         formatDate(
@@ -459,8 +676,13 @@
           ])
         );
 
-      const location = document.createElement("div");
-      location.className = "event-location";
+
+      const location =
+        document.createElement("div");
+
+      location.className =
+        "event-location";
+
 
       const locationValue =
         valueFrom(event, [
@@ -469,51 +691,88 @@
           "current_location"
         ]);
 
+
       location.textContent =
         locationValue
           ? String(locationValue)
           : "";
 
+
       item.appendChild(status);
+
       item.appendChild(date);
 
+
       if (locationValue) {
+
         item.appendChild(location);
+
       }
+
 
       timeline.appendChild(item);
+
     });
+
   }
 
-  function renderShipment(data, trackingNumber) {
+
+  function renderShipment(
+    data,
+    trackingNumber
+  ) {
+
     let response = data;
 
+
     if (typeof response === "string") {
+
       try {
-        response = JSON.parse(response);
+
+        response =
+          JSON.parse(response);
+
       } catch (error) {
+
         response = {
+
           found: true,
+
           shipment: {
-            tracking_number: trackingNumber,
-            status: response
+
+            tracking_number:
+              trackingNumber,
+
+            status:
+              response
+
           }
+
         };
+
       }
+
     }
+
 
     if (
       Array.isArray(response) &&
       response.length === 1
     ) {
-      response = response[0];
+
+      response =
+        response[0];
+
     }
+
 
     if (
       response &&
       response.found === false
     ) {
-      result.style.display = "none";
+
+      result.style.display =
+        "none";
 
       showMessage(
         "No shipment was found for tracking number: " +
@@ -521,8 +780,10 @@
         "error"
       );
 
-      return;
+      return false;
+
     }
+
 
     const shipment =
       response &&
@@ -530,115 +791,256 @@
         ? response.shipment
         : response;
 
+
     const events =
       response &&
-      Array.isArray(response.tracking_events)
+      Array.isArray(
+        response.tracking_events
+      )
         ? response.tracking_events
+
         : response &&
-          Array.isArray(response.trackingEvents)
+          Array.isArray(
+            response.trackingEvents
+          )
           ? response.trackingEvents
+
           : shipment &&
-            Array.isArray(shipment.tracking_events)
+            Array.isArray(
+              shipment.tracking_events
+            )
             ? shipment.tracking_events
+
             : [];
+
+
+    const trackingValue =
+      valueFrom(shipment, [
+        "tracking_number",
+        "trackingNumber"
+      ]) ||
+      trackingNumber;
+
+
+    const receiver =
+      valueFrom(shipment, [
+        "receiver_name",
+        "receiver",
+        "recipient_name",
+        "recipient"
+      ]);
+
+
+    const receiverEmail =
+      valueFrom(shipment, [
+        "receiver_email",
+        "recipient_email"
+      ]);
+
+
+    const origin =
+      valueFrom(shipment, [
+        "origin_address",
+        "origin",
+        "origin_location",
+        "from"
+      ]);
+
+
+    const destination =
+      valueFrom(shipment, [
+        "destination_address",
+        "destination",
+        "destination_location",
+        "to"
+      ]);
+
+
+    const currentLocation =
+      valueFrom(shipment, [
+        "current_location",
+        "currentLocation",
+        "location"
+      ]);
+
+
+    const status =
+      valueFrom(shipment, [
+        "status",
+        "shipment_status"
+      ]) ||
+      "In Transit";
+
+
+    const delivery =
+      valueFrom(shipment, [
+        "estimated_delivery",
+        "estimated_delivery_date",
+        "delivery_date"
+      ]);
+
+
+    const updated =
+      valueFrom(shipment, [
+        "updated_at",
+        "last_updated"
+      ]);
+
+
+    let progress =
+      valueFrom(shipment, [
+        "progress_percent",
+        "progress",
+        "progressPercentage"
+      ]);
+
+
+    progress =
+      Number(progress);
+
+
+    if (
+      isNaN(progress) ||
+      progress < 0
+    ) {
+
+      progress = 0;
+
+    }
+
+
+    if (progress > 100) {
+
+      progress = 100;
+
+    }
+
 
     document.getElementById(
       "displayTracking"
     ).textContent =
-      valueFrom(shipment, [
-        "tracking_number",
-        "trackingNumber"
-      ]) || trackingNumber;
+      trackingValue;
+
 
     document.getElementById(
-      "displayStatus"
+      "displayReceiver"
     ).textContent =
-      valueFrom(shipment, [
-        "status",
-        "shipment_status"
-      ]) || "In Transit";
+      receiver || "-";
+
+
+    document.getElementById(
+      "displayReceiverEmail"
+    ).textContent =
+      receiverEmail || "-";
+
 
     document.getElementById(
       "displayOrigin"
     ).textContent =
-      valueFrom(shipment, [
-        "origin",
-        "origin_location",
-        "from"
-      ]) || "-";
+      origin || "-";
+
 
     document.getElementById(
       "displayDestination"
     ).textContent =
-      valueFrom(shipment, [
-        "destination",
-        "destination_location",
-        "to"
-      ]) || "-";
+      destination || "-";
+
+
+    document.getElementById(
+      "displayCurrentLocation"
+    ).textContent =
+      currentLocation || "-";
+
+
+    document.getElementById(
+      "displayStatus"
+    ).textContent =
+      status;
+
 
     document.getElementById(
       "displayDelivery"
     ).textContent =
-      formatDate(
-        valueFrom(shipment, [
-          "estimated_delivery",
-          "estimated_delivery_date",
-          "delivery_date"
-        ])
-      );
+      formatDate(delivery);
+
+
+    document.getElementById(
+      "displayUpdated"
+    ).textContent =
+      formatDate(updated);
+
+
+    document.getElementById(
+      "displayProgress"
+    ).textContent =
+      progress + "%";
+
+
+    document.getElementById(
+      "progressFill"
+    ).style.width =
+      progress + "%";
+
 
     renderEvents(events);
 
-    result.style.display = "block";
+
+    result.style.display =
+      "block";
+
 
     showMessage(
-      "Shipment found successfully.",
+      "Shipment information updated successfully.",
       "success"
     );
+
+
+    return true;
+
   }
 
-  async function trackShipment() {
-    const trackingNumber =
-      trackingInput.value.trim();
 
-    result.style.display = "none";
-    hideMessage();
+  async function fetchShipment(
+    trackingNumber,
+    showLoading
+  ) {
 
-    if (!trackingNumber) {
+    if (showLoading) {
+
       showMessage(
-        "Please enter a tracking number.",
-        "error"
+        "Connecting to the SwiftDrop shipment database...",
+        "info"
       );
 
-      trackingInput.focus();
-      return;
     }
 
-    trackButton.disabled = true;
-    trackButton.textContent = "Tracking...";
-
-    showMessage(
-      "Connecting to the SwiftDrop shipment database...",
-      "info"
-    );
 
     const controller =
       new AbortController();
 
+
     const timeout =
       setTimeout(function() {
+
         controller.abort();
+
       }, 20000);
 
+
     try {
+
       const response =
         await fetch(
+
           SUPABASE_URL +
           "/rest/v1/rpc/get_tracking_info",
+
           {
+
             method: "POST",
 
             headers: {
+
               "apikey":
                 SUPABASE_PUBLISHABLE_KEY,
 
@@ -648,88 +1050,249 @@
 
               "Content-Type":
                 "application/json"
+
             },
 
             body: JSON.stringify({
+
               p_tracking_number:
                 trackingNumber
+
             }),
 
             cache: "no-store",
 
-            signal: controller.signal
+            signal:
+              controller.signal
+
           }
+
         );
+
 
       const responseText =
         await response.text();
 
+
       if (!response.ok) {
+
         throw new Error(
+
           "Supabase returned HTTP " +
           response.status +
           "\n\n" +
           responseText
+
         );
+
       }
+
 
       let data;
 
+
       try {
-        data = JSON.parse(responseText);
+
+        data =
+          JSON.parse(responseText);
+
       } catch (error) {
+
         throw new Error(
+
           "The database returned an unexpected response:\n\n" +
           responseText
+
         );
+
       }
 
-      renderShipment(
+
+      return renderShipment(
         data,
         trackingNumber
       );
+
 
     } catch (error) {
 
       console.error(error);
 
-      if (error.name === "AbortError") {
+
+      if (
+        error.name === "AbortError"
+      ) {
+
         showMessage(
           "The tracking request timed out. Please try again.",
           "error"
         );
+
       } else {
+
         showMessage(
           "Tracking connection error:\n\n" +
           error.message,
           "error"
         );
+
       }
+
+
+      return false;
+
 
     } finally {
 
       clearTimeout(timeout);
 
-      trackButton.disabled = false;
-      trackButton.textContent =
-        "Track Shipment";
     }
+
   }
+
+
+  async function trackShipment() {
+
+    const trackingNumber =
+      trackingInput.value.trim();
+
+
+    if (!trackingNumber) {
+
+      showMessage(
+        "Please enter a tracking number.",
+        "error"
+      );
+
+      trackingInput.focus();
+
+      return;
+
+    }
+
+
+    currentTrackingNumber =
+      trackingNumber;
+
+
+    result.style.display =
+      "none";
+
+
+    hideMessage();
+
+
+    trackButton.disabled =
+      true;
+
+
+    trackButton.textContent =
+      "Tracking...";
+
+
+    await fetchShipment(
+      currentTrackingNumber,
+      true
+    );
+
+
+    trackButton.disabled =
+      false;
+
+
+    trackButton.textContent =
+      "Track Shipment";
+
+
+    startAutoRefresh();
+
+  }
+
+
+  function startAutoRefresh() {
+
+    if (refreshTimer) {
+
+      clearInterval(
+        refreshTimer
+      );
+
+    }
+
+
+    if (!currentTrackingNumber) {
+
+      return;
+
+    }
+
+
+    refreshTimer =
+      setInterval(
+        async function() {
+
+          if (
+            !currentTrackingNumber
+          ) {
+
+            return;
+
+          }
+
+
+          await fetchShipment(
+            currentTrackingNumber,
+            false
+          );
+
+        },
+
+        30000
+
+      );
+
+  }
+
 
   trackButton.addEventListener(
     "click",
     trackShipment
   );
 
+
   trackingInput.addEventListener(
     "keydown",
     function(event) {
-      if (event.key === "Enter") {
+
+      if (
+        event.key === "Enter"
+      ) {
+
         event.preventDefault();
+
         trackShipment();
+
       }
+
     }
   );
+
+
+  window.addEventListener(
+    "beforeunload",
+    function() {
+
+      if (refreshTimer) {
+
+        clearInterval(
+          refreshTimer
+        );
+
+      }
+
+    }
+  );
+
 </script>
 
 </body>
