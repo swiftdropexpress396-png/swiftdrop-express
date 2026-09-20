@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>SwiftDrop Express — Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #123f75;
+      color: white;
+      padding: 24px 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      opacity: 0.85;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 18px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 16px 0 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d5dbe5;
+      border-radius: 10px;
+      font-size: 16px;
+      background: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 10px;
+      background: #ff8a00;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #123f75;
+    }
+
+    button.logout {
+      background: #555;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .success {
+      display: block;
+      background: #e6f7ed;
+      color: #126b38;
+    }
+
+    .error {
+      display: block;
+      background: #fde8e8;
+      color: #a01818;
+    }
+
+    .shipment-info {
+      background: #f5f7fa;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .shipment-info p {
+      margin: 8px 0;
+    }
+
+    .top-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .top-row input {
+      flex: 1;
+    }
+
+    .top-row button {
+      width: 150px;
+      margin-top: 0;
+    }
+
+    @media (max-width: 600px) {
+      .top-row {
+        display: block;
+      }
+
+      .top-row button {
+        width: 100%;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>SwiftDrop Express</h1>
+  <p>Shipment Administration</p>
+</header>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div id="loginCard" class="card">
+    <h2>Admin Login</h2>
+
+    <label for="email">Email</label>
+    <input
+      type="email"
+      id="email"
+      placeholder="Admin email"
+      autocomplete="email"
+    >
+
+    <label for="password">Password</label>
+    <input
+      type="password"
+      id="password"
+      placeholder="Admin password"
+      autocomplete="current-password"
+    >
+
+    <button onclick="login()">Login</button>
+
+    <div id="loginMessage" class="message"></div>
+  </div>
+
+
+  <!-- ADMIN -->
+  <div id="adminCard" class="card hidden">
+
+    <h2>Manage Shipment</h2>
+
+    <div class="top-row">
+      <input
+        type="text"
+        id="trackingNumber"
+        placeholder="Enter tracking number"
+      >
+
+      <button class="secondary" onclick="findShipment()">
+        Find Shipment
+      </button>
+    </div>
+
+    <div id="shipmentInfo" class="shipment-info hidden">
+      <p><strong>Receiver:</strong> <span id="receiverName">-</span></p>
+      <p><strong>Origin:</strong> <span id="originAddress">-</span></p>
+      <p><strong>Destination:</strong> <span id="destinationAddress">-</span></p>
+    </div>
+
+
+    <div id="editFields" class="hidden">
+
+      <label for="status">Shipment Status</label>
+      <select id="status">
+        <option>Shipment Created</option>
+        <option>Picked Up</option>
+        <option>In Transit</option>
+        <option>Arrived at Hub</option>
+        <option>Out for Delivery</option>
+        <option>Delivered</option>
+      </select>
+
+
+      <label for="currentLocation">Current Location</label>
+      <input
+        type="text"
+        id="currentLocation"
+        placeholder="Example: Lagos Hub, Nigeria"
+      >
+
+
+      <label for="progress">Progress (%)</label>
+      <input
+        type="number"
+        id="progress"
+        min="0"
+        max="100"
+        placeholder="0"
+      >
+
+
+      <label for="estimatedDelivery">Estimated Delivery</label>
+      <input
+        type="datetime-local"
+        id="estimatedDelivery"
+      >
+
+
+      <button onclick="saveShipment()">
+        Save Shipment Update
+      </button>
+
+      <div id="saveMessage" class="message"></div>
+
+    </div>
+
+
+    <button class="logout" onclick="logout()">
+      Logout
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const SUPABASE_URL =
+    "https://vhwubwndtprchiwyvaxr.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_ew7AMBuWsEnIN7DX-yDesQ_toD2QZ8V";
+
+  const supabase =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+  let currentShipmentId = null;
+
+
+  function showMessage(elementId, message, type) {
+
+    const element =
+      document.getElementById(elementId);
+
+    element.textContent = message;
+
+    element.className =
+      "message " + type;
+  }
+
+
+  async function login() {
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+    if (!email || !password) {
+
+      showMessage(
+        "loginMessage",
+        "Please enter your email and password.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    const { error } =
+      await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+
+    if (error) {
+
+      showMessage(
+        "loginMessage",
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+
+    document
+      .getElementById("loginCard")
+      .classList.add("hidden");
+
+    document
+      .getElementById("adminCard")
+      .classList.remove("hidden");
+  }
+
+
+  async function logout() {
+
+    await supabase.auth.signOut();
+
+    document
+      .getElementById("adminCard")
+      .classList.add("hidden");
+
+    document
+      .getElementById("loginCard")
+      .classList.remove("hidden");
+  }
+
+
+  async function findShipment() {
+
+    const trackingNumber =
+      document
+        .getElementById("trackingNumber")
+        .value
+        .trim();
+
+    if (!trackingNumber) {
+
+      alert("Enter a tracking number.");
+
+      return;
+    }
+
+
+    const { data, error } =
+      await supabase
+        .from("shipments")
+        .select(
+          "id,tracking_number,receiver_name,origin_address,destination_address,status,current_location,estimated_delivery,progress_percent"
+        )
+        .eq("tracking_number", trackingNumber)
+        .maybeSingle();
+
+
+    if (error) {
+
+      showMessage(
+        "saveMessage",
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (!data) {
+
+      document
+        .getElementById("shipmentInfo")
+        .classList.add("hidden");
+
+      document
+        .getElementById("editFields")
+        .classList.add("hidden");
+
+      showMessage(
+        "saveMessage",
+        "Shipment not found.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    currentShipmentId = data.id;
+
+
+    document.getElementById("receiverName").textContent =
+      data.receiver_name || "-";
+
+    document.getElementById("originAddress").textContent =
+      data.origin_address || "-";
+
+    document.getElementById("destinationAddress").textContent =
+      data.destination_address || "-";
+
+
+    document.getElementById("status").value =
+      data.status || "Shipment Created";
+
+    document.getElementById("currentLocation").value =
+      data.current_location || "";
+
+    document.getElementById("progress").value =
+      data.progress_percent ?? 0;
+
+
+    if (data.estimated_delivery) {
+
+      const date =
+        new Date(data.estimated_delivery);
+
+      const local =
+        new Date(
+          date.getTime() -
+          date.getTimezoneOffset() * 60000
+        );
+
+      document
+        .getElementById("estimatedDelivery")
+        .value =
+          local.toISOString().slice(0, 16);
+
+    } else {
+
+      document
+        .getElementById("estimatedDelivery")
+        .value = "";
+    }
+
+
+    document
+      .getElementById("shipmentInfo")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("editFields")
+      .classList.remove("hidden");
+
+
+    document
+      .getElementById("saveMessage")
+      .className = "message";
+  }
+
+
+  async function saveShipment() {
+
+    if (!currentShipmentId) {
+
+      showMessage(
+        "saveMessage",
+        "Find a shipment first.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    const status =
+      document.getElementById("status").value;
+
+    const currentLocation =
+      document
+        .getElementById("currentLocation")
+        .value
+        .trim();
+
+    const progress =
+      Number(
+        document.getElementById("progress").value
+      );
+
+
+    const deliveryValue =
+      document
+        .getElementById("estimatedDelivery")
+        .value;
+
+
+    if (progress < 0 || progress > 100) {
+
+      showMessage(
+        "saveMessage",
+        "Progress must be between 0 and 100.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    let estimatedDelivery = null;
+
+    if (deliveryValue) {
+      estimatedDelivery =
+        new Date(deliveryValue).toISOString();
+    }
+
+
+    const { error } =
+      await supabase
+        .from("shipments")
+        .update({
+          status: status,
+          current_location: currentLocation || null,
+          progress_percent: progress,
+          estimated_delivery: estimatedDelivery,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", currentShipmentId);
+
+
+    if (error) {
+
+      showMessage(
+        "saveMessage",
+        error.message,
+        "error"
+      );
+
+      return;
+    }
+
+
+    showMessage(
+      "saveMessage",
+      "Shipment updated successfully.",
+      "success"
+    );
+  }
+
+
+  async function checkSession() {
+
+    const { data } =
+      await supabase.auth.getSession();
+
+    if (data.session) {
+
+      document
+        .getElementById("loginCard")
+        .classList.add("hidden");
+
+      document
+        .getElementById("adminCard")
+        .classList.remove("hidden");
+    }
+  }
+
+
+  checkSession();
+
+</script>
+
+</body>
+</html>
