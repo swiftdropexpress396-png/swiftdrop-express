@@ -615,6 +615,38 @@
   }
 
 
+  /*
+    Estimated Delivery is a DATE, not a specific time.
+    This keeps 23 Sep 2026 as 23/09/2026
+    instead of allowing timezone conversion to change it.
+  */
+  function formatDeliveryDate(value) {
+
+    if (!value) {
+      return "-";
+    }
+
+    const datePart =
+      String(value).split("T")[0];
+
+    const parts =
+      datePart.split("-");
+
+    if (parts.length === 3) {
+
+      const year = parts[0];
+      const month = parts[1];
+      const day = parts[2];
+
+      return `${day}/${month}/${year}`;
+
+    }
+
+    return String(value);
+
+  }
+
+
   function renderEvents(events) {
 
     const timeline =
@@ -961,7 +993,7 @@
     document.getElementById(
       "displayDelivery"
     ).textContent =
-      formatDate(delivery);
+      formatDeliveryDate(delivery);
 
 
     document.getElementById(
